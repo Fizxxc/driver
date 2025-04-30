@@ -32,9 +32,19 @@ io.on('connection', (socket) => {
   });
 });
 
+// Tambahkan route manual untuk index, user, dan driver
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
+
+app.get('/user', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/user.html'));
+});
+
+app.get('/driver', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/driver.html'));
+});
+
 
 // Menjalankan server pada port 3000
 server.listen(3000, () => {
