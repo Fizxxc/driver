@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User View - Live Driver Location</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; width: 100vw; }
+
+    .circle-icon {
+      border: 2px solid white;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 40px;
+      height: 40px;
+      box-shadow: 0 0 5px #00000066;
+    }
+
+    .circle-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const map = L.map('map');
+    const driverMarkers = {};
+    let mapCentered = false;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    function createCircleIcon(photoUrl) {
+      const div = document.createElement('div');
+      div.className = 'circle-icon';
+      const img = document.createElement('img');
+      img.src = photoUrl;
+      div.appendChild(img);
+      return L.divIcon({ html: div, className: '', iconSize: [40, 40] });
+    }
+
+    socket.on('updateDriverLocations', drivers => {
+      for (const [id, data] of Object.entries(drivers)) {
+        const position = [data.lat, data.lng];
+
+        if (!driverMarkers[id]) {
+          const marker = L.marker(position, {
+            icon: createCircleIcon(data.photo || 'https://i.imgur.com/6b6psnA.png') // default avatar
+          }).addTo(map).bindPopup(`<b>${data.name}</b>`);
+
+          driverMarkers[id] = marker;
+
+          if (!mapCentered) {
+            map.setView(position, 17);
+            mapCentered = true;
+          }
+        } else {
+          driverMarkers[id].setLatLng(position);
+        }
+      }
+
+      // Hapus marker yang sudah tidak aktif
+      for (const id of Object.keys(driverMarkers)) {
+        if (!drivers[id]) {
+          map.removeLayer(driverMarkers[id]);
+          delete driverMarkers[id];
+        }
+      }
+    });
+  </script>
+</body>
+</html>
