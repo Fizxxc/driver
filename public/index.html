@@ -1,29 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Driver Tracking - Home</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Driver Tracker - Beranda</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2980b9, #6dd5fa);
+      height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      color: white;
       text-align: center;
     }
 
     h1 {
       font-size: 2.5em;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
-    .button {
+    p {
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+
+    .menu-btn {
       background-color: white;
       color: #0072ff;
       border: none;
@@ -31,17 +36,20 @@
       font-size: 1.2em;
       border-radius: 8px;
       cursor: pointer;
+      margin: 10px;
       transition: 0.3s;
     }
 
-    .button:hover {
-      background-color: #e0e0e0;
+    .menu-btn:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-  <h1>Selamat Datang di Driver Delibo</h1>
-  <p>Lihat lokasi driver secara langsung</p>
-  <button class="button" onclick="window.location.href='/public/user.html'">Masuk sebagai Pengguna</button>
+  <h1>Live Driver Delibo</h1>
+  <p>Pilih peran Anda</p>
+
+  <button class="menu-btn" onclick="window.location.href='/user'">Masuk sebagai Pengguna</button>
+  <button class="menu-btn" onclick="window.location.href='/driver'">Masuk sebagai Driver</button>
 </body>
 </html>
