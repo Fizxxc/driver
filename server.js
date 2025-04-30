@@ -32,17 +32,18 @@ io.on('connection', (socket) => {
   });
 });
 
-// Tambahkan route manual untuk index, user, dan driver
+const path = require('path');
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/user', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/user.html'));
+  res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
 
 app.get('/driver', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/driver.html'));
+  res.sendFile(path.join(__dirname, 'public', 'driver.html'));
 });
 
 
