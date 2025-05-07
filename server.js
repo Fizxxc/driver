@@ -1,51 +1,38 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-const path = require('path');
+const server = http.createServer(app);
+const io = new Server(server);
 
-let messages = [];
-let adminOnline = true;
+app.use(express.static('public')); // Folder untuk file HTML dan statis lainnya
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+let driverLocations = {}; // Menyimpan lokasi driver berdasarkan socket.id
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
-});
-
-app.get('/admin-inbox', (req, res) => {
-  res.render('admin', { messages });
-});
-
+// Ketika ada koneksi dari client
 io.on('connection', (socket) => {
-  console.log('A user connected');
-  socket.emit('admin status', adminOnline);
+  console.log('Client connected:', socket.id);
 
-  socket.on('chat message', (msg) => {
-    messages.push({ from: 'user', text: msg });
-    io.emit('chat message', { from: 'user', text: msg });
+  // Mendapatkan update lokasi dari driver
+  socket.on('driverLocationUpdate', (data) => {
+    driverLocations[socket.id] = {
+      lat: data.lat,
+      lng: data.lng,
+      name: data.name || `Driver ${socket.id}`,  // Jika nama kosong, gunakan ID socket
+      photo: data.photo || 'https://i.imgur.com/6b6psnA.png' // Default foto profil
+    };
+    io.emit('updateDriverLocations', driverLocations); // Mengirim update ke semua client
   });
 
-  socket.on('admin reply', (msg) => {
-    messages.push({ from: 'admin', text: msg });
-    io.emit('chat message', { from: 'admin', text: msg });
-  });
-
-  socket.on('admin status', (status) => {
-    adminOnline = status;
-    io.emit('admin status', adminOnline);
-  });
-
+  // Menghapus driver dari daftar saat disconnect
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    delete driverLocations[socket.id];
+    io.emit('updateDriverLocations', driverLocations); // Kirim update setelah driver disconnect
   });
 });
 
-const port = process.env.PORT || 3000;
-http.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+// Menjalankan server pada port 3000
+server.listen(3000, () => {
+  console.log('Server running at http://localhost:3000');
 });
-
-module.exports = app; // Penting untuk Vercel
